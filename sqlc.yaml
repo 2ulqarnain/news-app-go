@@ -1,0 +1,10 @@
+version: 2
+sql:
+  - schema: "internals/database/sql/schema.sql"
+    queries: "internals/database/sql/queries/news.sql"
+    engine: "sqlite"
+    gen:
+      go:
+        package: "database"
+        out: "internals/database"
+        emit_prepared_queries: true

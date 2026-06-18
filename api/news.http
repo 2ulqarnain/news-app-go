@@ -1,0 +1,4 @@
+### GetAllNews
+    http://localhost:{{port}}/news/
+
+###
