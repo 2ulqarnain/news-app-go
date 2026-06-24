@@ -4,14 +4,10 @@
 
 package database
 
-import (
-	"database/sql"
-)
-
 type News struct {
 	ID        int64
 	Title     string
-	NewsUrl   sql.NullString
-	ImageUrl  sql.NullString
-	CreatedOn sql.NullString
+	NewsUrl   string
+	ImageUrl  string
+	CreatedOn string
 }

@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createNews = `-- name: CreateNews :exec
@@ -21,8 +20,8 @@ VALUES (?, ?, ?)
 
 type CreateNewsParams struct {
 	Title    string
-	NewsUrl  sql.NullString
-	ImageUrl sql.NullString
+	NewsUrl  string
+	ImageUrl string
 }
 
 func (q *Queries) CreateNews(ctx context.Context, arg CreateNewsParams) error {

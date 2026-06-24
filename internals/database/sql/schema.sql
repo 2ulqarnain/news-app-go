@@ -1,9 +1,9 @@
 CREATE TABLE news (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    news_url TEXT,
-    image_url TEXT,
-    created_on TEXT DEFAULT CURRENT_TIMESTAMP
+    news_url TEXT NOT NULL,
+    image_url TEXT NOT NULL,
+    created_on TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TRIGGER created_on_trigger

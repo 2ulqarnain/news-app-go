@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"GoNewsScrapper/internals/database"
 	"GoNewsScrapper/internals/service"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -18,12 +18,19 @@ type News struct {
 	svc *service.News
 }
 
-func (n *News) CreateBulkNews(w http.ResponseWriter, r *http.Request) {
-	var news []database.CreateNewsParams
-	if err := json.NewDecoder(r.Body).Decode(&news); err != nil {
-		http.Error(w, "Invalid Request Body", http.StatusBadRequest)
-		return
+func (n *News) Crawl(w http.ResponseWriter, r *http.Request) {
+	var err error
+	go func() {
+		if err = n.svc.CrawlNews(); err != nil {
+			log.Println(err)
+		}
+	}()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("Crawled Successfully!"))
 }
 
 func (n *News) GetAllNews(w http.ResponseWriter, r *http.Request) {

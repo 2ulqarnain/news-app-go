@@ -1,4 +1,6 @@
 ### GetAllNews
     http://localhost:{{port}}/news/
 
+### CrawlNews
+    POST http://localhost:{{port}}/news/crawl
 ###

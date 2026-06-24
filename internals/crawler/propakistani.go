@@ -1,32 +1,24 @@
-package service
+package crawler
 
 import (
 	"GoNewsScrapper/internals/database"
 	"GoNewsScrapper/internals/repository"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chromedp/chromedp"
 )
 
-type News struct {
+type Crawler struct {
 	repo *repository.News
 }
 
-func NewNews(repo *repository.News) *News {
-	return &News{repo: repo}
+func New(repo *repository.News) *Crawler {
+	return &Crawler{repo: repo}
 }
 
-func (n *News) CreateNews(ctx context.Context, news []database.CreateNewsParams) error {
-	return n.repo.InsertNewsBulk(ctx, news)
-}
+func (c *Crawler) CrawlProPakistaniPk() error {
 
-func (n *News) GetAllNews(ctx context.Context) ([]database.News, error) {
-	return n.repo.GetAllNews(ctx)
-}
-
-func (n *News) CrawlNews() error {
 	url := "https://propakistani.pk"
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
@@ -38,36 +30,32 @@ func (n *News) CrawlNews() error {
 	defer cancel()
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 20*time.Second)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	var pageTitle string
 	var news []database.CreateNewsParams
 
-	fmt.Println("Crawling started...")
 	err := chromedp.Run(ctxWithTimeout,
 		chromedp.Navigate(url),
-		chromedp.WaitVisible("div.teams-news"),
+		chromedp.WaitVisible("div.team-news"),
 		chromedp.Title(&pageTitle),
 		chromedp.Evaluate(`
 			Array.from(document.querySelectorAll('div.tnews-inner.relv')).map(el => {
     		let news_url = el.querySelector('a').href
     		let image_url = el.querySelector('img').src
     		let title = el.querySelector('h5').textContent
-    		return {newsURL, imageURL, title}
+    		return {news_url, image_url, title}
 		})`, &news),
 	)
 	if err != nil {
-
 		return err
 	}
 
-	err = n.CreateNews(ctx, news)
+	err = c.repo.InsertNewsBulk(ctx, news)
 	if err != nil {
 		return err
 	}
-	fmt.Println(pageTitle)
 
-	fmt.Println("Crawling finished!")
 	return nil
 }

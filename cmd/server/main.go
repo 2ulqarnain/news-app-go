@@ -29,6 +29,6 @@ func main() {
 	r := routes.NewsRouter(handler)
 
 	addr := fmt.Sprintf(":%s", config.Port)
-	fmt.Printf("\nListening on %s...", addr)
+	fmt.Printf("\nListening on %s...\n", addr)
 	http.ListenAndServe(addr, r)
 }
