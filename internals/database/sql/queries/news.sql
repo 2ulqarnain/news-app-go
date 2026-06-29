@@ -1,10 +1,11 @@
 -- name: CreateNews :exec
 INSERT INTO news (
+                  slug,
                   title,
                   news_url,
                   image_url
 )
-VALUES (?, ?, ?);
+VALUES (?, ?, ?, ?);
 
 -- name: GetAllNews :many
 SELECT * FROM news;

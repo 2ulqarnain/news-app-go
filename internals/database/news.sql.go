@@ -11,26 +11,33 @@ import (
 
 const createNews = `-- name: CreateNews :exec
 INSERT INTO news (
+                  slug,
                   title,
                   news_url,
                   image_url
 )
-VALUES (?, ?, ?)
+VALUES (?, ?, ?, ?)
 `
 
 type CreateNewsParams struct {
+	Slug     string
 	Title    string
 	NewsUrl  string
 	ImageUrl string
 }
 
 func (q *Queries) CreateNews(ctx context.Context, arg CreateNewsParams) error {
-	_, err := q.exec(ctx, q.createNewsStmt, createNews, arg.Title, arg.NewsUrl, arg.ImageUrl)
+	_, err := q.exec(ctx, q.createNewsStmt, createNews,
+		arg.Slug,
+		arg.Title,
+		arg.NewsUrl,
+		arg.ImageUrl,
+	)
 	return err
 }
 
 const getAllNews = `-- name: GetAllNews :many
-SELECT id, title, news_url, image_url, created_on FROM news
+SELECT id, title, news_url, image_url, slug, created_on FROM news
 `
 
 func (q *Queries) GetAllNews(ctx context.Context) ([]News, error) {
@@ -47,6 +54,7 @@ func (q *Queries) GetAllNews(ctx context.Context) ([]News, error) {
 			&i.Title,
 			&i.NewsUrl,
 			&i.ImageUrl,
+			&i.Slug,
 			&i.CreatedOn,
 		); err != nil {
 			return nil, err
@@ -63,7 +71,7 @@ func (q *Queries) GetAllNews(ctx context.Context) ([]News, error) {
 }
 
 const getNewsByTitle = `-- name: GetNewsByTitle :many
-SELECT id, title, news_url, image_url, created_on FROM news where INSTR(title, ?) > 0
+SELECT id, title, news_url, image_url, slug, created_on FROM news where INSTR(title, ?) > 0
 `
 
 func (q *Queries) GetNewsByTitle(ctx context.Context, instr string) ([]News, error) {
@@ -80,6 +88,7 @@ func (q *Queries) GetNewsByTitle(ctx context.Context, instr string) ([]News, err
 			&i.Title,
 			&i.NewsUrl,
 			&i.ImageUrl,
+			&i.Slug,
 			&i.CreatedOn,
 		); err != nil {
 			return nil, err

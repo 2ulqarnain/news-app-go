@@ -50,12 +50,15 @@ func (n *News) CrawlNews() error {
 		chromedp.WaitVisible("div.teams-news"),
 		chromedp.Title(&pageTitle),
 		chromedp.Evaluate(`
-			Array.from(document.querySelectorAll('div.tnews-inner.relv')).map(el => {
-    		let news_url = el.querySelector('a').href
-    		let image_url = el.querySelector('img').src
-    		let title = el.querySelector('h5').textContent
-    		return {newsURL, imageURL, title}
-		})`, &news),
+			Array.from(document.querySelectorAll(".g1-mosaic-item:has(.g1-frame img), div.tnews-inner.relv")).map(el=>{
+				let news = {}
+				news.newsUrl = el.querySelector("a").href
+				news.imageUrl = el.querySelector("img").src
+				news.title = el.querySelector("h3, h5")?.textContent
+				news.slug = news.url?.split('/')?.at(-2)
+				return news
+			})
+		`, &news),
 	)
 	if err != nil {
 

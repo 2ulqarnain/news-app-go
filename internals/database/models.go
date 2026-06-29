@@ -9,5 +9,6 @@ type News struct {
 	Title     string
 	NewsUrl   string
 	ImageUrl  string
+	Slug      string
 	CreatedOn string
 }

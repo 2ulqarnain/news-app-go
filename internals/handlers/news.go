@@ -8,17 +8,11 @@ import (
 	"net/http"
 )
 
-type news interface {
-	CreateBulkNews(w http.ResponseWriter, r *http.Request)
-	GetAllNews(w http.ResponseWriter, r *http.Request)
-	SearchNewsByTitle(w http.ResponseWriter, r *http.Request)
-}
-
 type News struct {
 	svc *service.News
 }
 
-func (n *News) Crawl(w http.ResponseWriter, r *http.Request) {
+func (n *News) Crawl(w http.ResponseWriter, _ *http.Request) {
 	var err error
 	go func() {
 		if err = n.svc.CrawlNews(); err != nil {
@@ -30,7 +24,7 @@ func (n *News) Crawl(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("Crawled Successfully!"))
+	_, _ = w.Write([]byte("Crawled Successfully!"))
 }
 
 func (n *News) GetAllNews(w http.ResponseWriter, r *http.Request) {
@@ -40,10 +34,10 @@ func (n *News) GetAllNews(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
-	json.NewEncoder(w).Encode(news)
+	_ = json.NewEncoder(w).Encode(news)
 }
 
-func (n *News) SearchNewsByTitle(w http.ResponseWriter, r *http.Request) {
+func (n *News) SearchNewsByTitle(_ http.ResponseWriter, _ *http.Request) {
 	//TODO implement me
 	panic("implement me")
 }
