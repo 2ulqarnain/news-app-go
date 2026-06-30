@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Build Crawler" type="GoApplicationRunConfiguration" factoryName="Go Application" activateToolWindowBeforeRun="false">
+    <module name="GoNewsScrapper" />
+    <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="PORT" value="8100" />
+      <env name="DB_FILE_PATH" value="../db/news.db" />
+    </envs>
+    <kind value="FILE" />
+    <package value="GoNewsScrapper" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/job/main.go" />
+    <output_directory value="$PROJECT_DIR$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

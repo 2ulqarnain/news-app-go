@@ -4,7 +4,7 @@ import (
 	"GoNewsScrapper/internals/database"
 	"GoNewsScrapper/internals/repository"
 	"context"
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/chromedp/chromedp"
@@ -44,7 +44,7 @@ func (n *News) CrawlNews() error {
 	var pageTitle string
 	var news []database.CreateNewsParams
 
-	fmt.Println("Crawling started...")
+	log.Println("crawling started...")
 	err := chromedp.Run(ctxWithTimeout,
 		chromedp.Navigate(url),
 		chromedp.WaitVisible("div.teams-news"),
@@ -69,8 +69,7 @@ func (n *News) CrawlNews() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(pageTitle)
 
-	fmt.Println("Crawling finished!")
+	log.Printf("crawling finished, crawled %d news", len(news))
 	return nil
 }

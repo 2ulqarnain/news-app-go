@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Get All News" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" focusToolWindowBeforeRun="true" environment="local" path="$PROJECT_DIR$/api/news.http" executionIdentifier="GetAllNews" runType="Run single request">
+    <method v="2" />
+  </configuration>
+</component>

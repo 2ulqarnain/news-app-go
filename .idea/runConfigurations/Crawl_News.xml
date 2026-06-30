@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Crawl News" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" focusToolWindowBeforeRun="true" environment="local" path="$PROJECT_DIR$/api/news.http" executionIdentifier="CrawlNews" index="2" runType="Run single request">
+    <method v="2" />
+  </configuration>
+</component>

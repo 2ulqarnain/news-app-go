@@ -1,31 +1,22 @@
 package main
 
 import (
+	newsApp "GoNewsScrapper/internals/app"
 	"GoNewsScrapper/internals/config"
-	"GoNewsScrapper/internals/database"
 	"GoNewsScrapper/internals/handlers"
-	"GoNewsScrapper/internals/repository"
 	"GoNewsScrapper/internals/routes"
-	"GoNewsScrapper/internals/service"
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 )
 
 func main() {
-	db, err := database.Connect()
+	app, err := newsApp.New()
 	if err != nil {
 		log.Fatal(err)
 	}
-	queries, err := database.Prepare(context.Background(), db)
-	if err != nil {
-		log.Fatalln("Error preparing query: ", err)
-	}
-	defer queries.Close()
-	repo := repository.NewNews(queries, db)
-	svc := service.NewNews(repo)
-	handler := handlers.NewNews(svc)
+	defer app.Close()
+	handler := handlers.NewNews(app.NewsService)
 	r := routes.NewsRouter(handler)
 
 	addr := fmt.Sprintf(":%s", config.Port)
