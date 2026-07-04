@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"GoNewsScrapper/internals/service"
 	"encoding/json"
 	"fmt"
 	"log"
