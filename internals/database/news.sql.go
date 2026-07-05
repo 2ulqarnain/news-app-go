@@ -36,6 +36,22 @@ func (q *Queries) CreateNews(ctx context.Context, arg CreateNewsParams) error {
 	return err
 }
 
+const createTableNews = `-- name: CreateTableNews :exec
+CREATE TABLE IF NOT EXISTS news (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    news_url TEXT NOT NULL,
+    image_url TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    created_on TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+`
+
+func (q *Queries) CreateTableNews(ctx context.Context) error {
+	_, err := q.exec(ctx, q.createTableNewsStmt, createTableNews)
+	return err
+}
+
 const getAllNews = `-- name: GetAllNews :many
 SELECT id, title, news_url, image_url, slug, created_on FROM news
 `

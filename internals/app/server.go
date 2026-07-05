@@ -22,6 +22,10 @@ func New() (*App, error) {
 	if err != nil {
 		log.Fatalln("Error preparing query: ", err)
 	}
+	err = InitializeDB(queries)
+	if err != nil {
+		log.Println("Error creating news table ", err)
+	}
 	repo := repository.NewNews(queries, db)
 	svc := service.NewNews(repo)
 
@@ -32,4 +36,8 @@ func New() (*App, error) {
 			return db.Close()
 		},
 	}, nil
+}
+
+func InitializeDB(queries *database.Queries) error {
+	return queries.CreateTableNews(context.Background())
 }

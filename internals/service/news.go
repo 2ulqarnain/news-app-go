@@ -41,14 +41,22 @@ func (n *News) CrawlNews() error {
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 
-	var pageTitle string
 	var news []database.CreateNewsParams
 
 	log.Println("crawling started...")
 	err := chromedp.Run(ctxWithTimeout,
 		chromedp.Navigate(url),
 		chromedp.WaitVisible("div.teams-news"),
-		chromedp.Title(&pageTitle),
+		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Sleep(2*time.Second),
+		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Sleep(2*time.Second),
+		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Sleep(2*time.Second),
+		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Sleep(2*time.Second),
+		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Sleep(2*time.Second),
 		chromedp.Evaluate(`
 			Array.from(document.querySelectorAll(".g1-mosaic-item:has(.g1-frame img), div.tnews-inner.relv")).map(el=>{
 				let news = {}

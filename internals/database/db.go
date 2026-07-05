@@ -27,6 +27,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createNewsStmt, err = db.PrepareContext(ctx, createNews); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateNews: %w", err)
 	}
+	if q.createTableNewsStmt, err = db.PrepareContext(ctx, createTableNews); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateTableNews: %w", err)
+	}
 	if q.getAllNewsStmt, err = db.PrepareContext(ctx, getAllNews); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllNews: %w", err)
 	}
@@ -41,6 +44,11 @@ func (q *Queries) Close() error {
 	if q.createNewsStmt != nil {
 		if cerr := q.createNewsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createNewsStmt: %w", cerr)
+		}
+	}
+	if q.createTableNewsStmt != nil {
+		if cerr := q.createTableNewsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createTableNewsStmt: %w", cerr)
 		}
 	}
 	if q.getAllNewsStmt != nil {
@@ -90,19 +98,21 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                 DBTX
-	tx                 *sql.Tx
-	createNewsStmt     *sql.Stmt
-	getAllNewsStmt     *sql.Stmt
-	getNewsByTitleStmt *sql.Stmt
+	db                  DBTX
+	tx                  *sql.Tx
+	createNewsStmt      *sql.Stmt
+	createTableNewsStmt *sql.Stmt
+	getAllNewsStmt      *sql.Stmt
+	getNewsByTitleStmt  *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                 tx,
-		tx:                 tx,
-		createNewsStmt:     q.createNewsStmt,
-		getAllNewsStmt:     q.getAllNewsStmt,
-		getNewsByTitleStmt: q.getNewsByTitleStmt,
+		db:                  tx,
+		tx:                  tx,
+		createNewsStmt:      q.createNewsStmt,
+		createTableNewsStmt: q.createTableNewsStmt,
+		getAllNewsStmt:      q.getAllNewsStmt,
+		getNewsByTitleStmt:  q.getNewsByTitleStmt,
 	}
 }
