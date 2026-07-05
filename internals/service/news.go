@@ -38,7 +38,7 @@ func (n *News) CrawlNews() error {
 	defer cancel()
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 20*time.Second)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	var news []database.CreateNewsParams
@@ -47,15 +47,11 @@ func (n *News) CrawlNews() error {
 	err := chromedp.Run(ctxWithTimeout,
 		chromedp.Navigate(url),
 		chromedp.WaitVisible("div.teams-news"),
-		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Click("input#pp-load-posts", chromedp.ByQuery),
 		chromedp.Sleep(2*time.Second),
-		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Click("input#pp-load-posts", chromedp.ByQuery),
 		chromedp.Sleep(2*time.Second),
-		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
-		chromedp.Sleep(2*time.Second),
-		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
-		chromedp.Sleep(2*time.Second),
-		chromedp.Click("input#pp-load-posts", chromedp.NodeVisible),
+		chromedp.Click("input#pp-load-posts", chromedp.ByQuery),
 		chromedp.Sleep(2*time.Second),
 		chromedp.Evaluate(`
 			Array.from(document.querySelectorAll(".g1-mosaic-item:has(.g1-frame img), div.tnews-inner.relv")).map(el=>{
