@@ -1,9 +1,9 @@
 CREATE TABLE news (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
+    slug TEXT NOT NULL,
     news_url TEXT NOT NULL,
     image_url TEXT NOT NULL,
-    slug TEXT NOT NULL,
+    title TEXT NOT NULL,
     created_on TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
