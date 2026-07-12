@@ -6,6 +6,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/fetch"
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 )
@@ -16,13 +18,15 @@ func CrawlProPakistaniPk(ctx context.Context, timeout time.Duration) ([]database
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		//chromedp.ExecPath("/usr/bin/chromium-browser"),
 
-		chromedp.Headless,
+		chromedp.Flag("headless", false),
 		chromedp.DisableGPU,
 		chromedp.NoSandbox,
 		chromedp.NoFirstRun,
 		chromedp.NoDefaultBrowserCheck,
 
 		chromedp.Flag("disable-dev-shm-usage", true),
+		chromedp.Flag("disable-blink-features", "AutomationControlled"),
+		chromedp.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"),
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("disable-background-timer-throttling", true),
 		chromedp.Flag("disable-renderer-backgrounding", true),
@@ -40,32 +44,44 @@ func CrawlProPakistaniPk(ctx context.Context, timeout time.Duration) ([]database
 	log.Println("crawling started...")
 	err := chromedp.Run(ctxWithTimeout,
 		network.Enable(),
+		network.SetCacheDisabled(true),
+		fetch.Enable().WithPatterns([]*fetch.RequestPattern{
+			{
+				URLPattern:   "*",
+				RequestStage: fetch.RequestStageRequest,
+			},
+		}),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			return network.SetBlockedURLs().WithURLPatterns([]*network.BlockPattern{
-				{URLPattern: "*://*/*.jpg"},
-				{URLPattern: "*://*/*.png"},
-				{URLPattern: "*://*/*.gif"},
-				{URLPattern: "*://*/*.avif"},
-				{URLPattern: "*://*/*.webp"},
-				{URLPattern: "*://*/*.svg"},
-				{URLPattern: "*://*/*.woff"},
-				{URLPattern: "*://*/*.woff2"},
-				{URLPattern: "*://*/*.ttf"},
-				{URLPattern: "*://*/*.otf"},
-				{URLPattern: "*://*/*.css"},
-				{URLPattern: "*://*doubleclick/*"},
-				{URLPattern: "*://*.youtube.*/*"},
-				{URLPattern: "*://*googletagmanager*/*"},
-			}).Do(ctx)
+			chromedp.ListenTarget(ctx, func(ev interface{}) {
+				switch e := ev.(type) {
+				case *fetch.EventRequestPaused:
+					go func() {
+						c := chromedp.FromContext(ctx)
+						if c == nil || c.Target == nil {
+							return // target not ready, drop safely instead of panicking
+						}
+						execCtx := cdp.WithExecutor(ctx, c.Target)
+
+						switch e.ResourceType {
+						case network.ResourceTypeImage,
+							network.ResourceTypeStylesheet,
+							network.ResourceTypeFont,
+							network.ResourceTypeMedia:
+							_ = fetch.FailRequest(e.RequestID, network.ErrorReasonBlockedByClient).Do(execCtx)
+						default:
+							_ = fetch.ContinueRequest(e.RequestID).Do(execCtx)
+						}
+					}()
+				}
+			})
+			return nil
 		}),
 		chromedp.Navigate(url),
 		chromedp.WaitVisible("div.teams-news"),
+		chromedp.Sleep(100*time.Second),
 		chromedp.Click("input#pp-load-posts", chromedp.ByQuery),
-		chromedp.Sleep(2*time.Second),
 		chromedp.Click("input#pp-load-posts", chromedp.ByQuery),
-		chromedp.Sleep(2*time.Second),
 		chromedp.Click("input#pp-load-posts", chromedp.ByQuery),
-		chromedp.Sleep(2*time.Second),
 		chromedp.Evaluate(`
 			Array.from(document.querySelectorAll(".g1-mosaic-item:has(.g1-frame img), div.tnews-inner.relv")).map(el=>{
 				let news = {}
@@ -77,15 +93,8 @@ func CrawlProPakistaniPk(ctx context.Context, timeout time.Duration) ([]database
 			})
 		`, &news),
 	)
+
 	if err != nil {
-		var html string
-
-		if e := chromedp.Run(ctx,
-			chromedp.OuterHTML("html", &html),
-		); e == nil {
-			log.Println(html)
-		}
-
 		return nil, err
 	}
 
