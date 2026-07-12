@@ -16,9 +16,9 @@ func CrawlProPakistaniPk(ctx context.Context, timeout time.Duration) ([]database
 	url := "https://propakistani.pk"
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		//chromedp.ExecPath("/usr/bin/chromium-browser"),
+		chromedp.ExecPath("/usr/bin/google-chrome"),
 
-		chromedp.Flag("headless", false),
+		chromedp.Headless,
 		chromedp.DisableGPU,
 		chromedp.NoSandbox,
 		chromedp.NoFirstRun,
